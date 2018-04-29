@@ -29,7 +29,6 @@ class Board(GridLayout):
                 button.background_color = self._board_color
                 self._buttons[button_id] = button
                 self.add_widget(button)
-                print('Button position: ' + str(button.pos))
 
     def on_press_callback(self, button):
         print('Button position: ' + str(button.pos))
@@ -44,18 +43,16 @@ class Board(GridLayout):
     def update_board(self, matrix):
         for x in range(self._board_rows):
             for y in range(self._board_columns):
+                button = self._buttons[self.position_to_id(x, y)]
+                self.clear_previous_stone(button)
                 status = matrix[x][y]
-                print('status: ' + str(status))
                 if status == 0:
                     continue
                 else:
-                    button = self._buttons[self.position_to_id(x, y)]
-                    self.place_stone(
-                        button, x, y, 'black' if status == -1 else 'white')
+                    self.place_stone(x, y, 'black' if status == -1 else 'white')
 
-    def place_stone(self, button, x, y, color):
-        self.clear_previous_stone(button)
-
+    def place_stone(self, x, y, color):
+        button = self._buttons[self.position_to_id(x, y)]
         stone_size, stone_position = self.compute_stone_size_and_position(
             button)
         if color is 'black':
@@ -66,9 +63,7 @@ class Board(GridLayout):
             button.canvas.add(stone)
 
     def clear_previous_stone(self, button):
-        groups = button.canvas.get_group(self._stone_name)
-        for group in groups:
-            button.canvas.remove(group)
+        button.canvas.remove_group(self._stone_name)
 
     def position_to_id(self, x, y):
         return str(x) + ' : ' + str(y)
@@ -87,7 +82,7 @@ class Board(GridLayout):
         return self.new_stone(position, size, Color(0.0, 0.0, 0.0, 1))
 
     def new_stone(self, position, size, color):
-        stone = InstructionGroup(name=self._stone_name)
+        stone = InstructionGroup(group=self._stone_name)
         stone.add(color)
         stone.add(Ellipse(size=size, pos=position))
         return stone
