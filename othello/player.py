@@ -10,3 +10,6 @@ class Player(object):
 
     def select_move(self, board_state):
         pass
+
+    def force_kill(self):
+        pass

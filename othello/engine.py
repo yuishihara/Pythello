@@ -36,8 +36,7 @@ class Engine(object):
     def run_game(self):
         while self._is_playing:
             print('playing!!')
-            if not self.has_valid_move(self._player_black, self._board_state) and \
-                    not self.has_valid_move(self._player_white, self._board_state):
+            if utilities.is_end_state(self._board_state):
                 print("No valid moves for both players. End of game")
                 break
             self.wait_player_move(self._player_black, self._board_state)

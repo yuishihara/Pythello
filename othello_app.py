@@ -3,7 +3,11 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from board import Board
 from human_player import HumanPlayer
+from ai_player import AiPlayer
 from othello.engine import Engine
+from othello.ai.evaluator import Evaluator
+from othello.ai.minimax import MiniMax
+from othello.ai.alpha_beta import AlphaBeta
 
 
 class OthelloApp(App):
@@ -12,7 +16,7 @@ class OthelloApp(App):
         columns = 8
         self._board = self.setup_board(rows, columns)
         self._engine = Engine(HumanPlayer(self._board),
-                              HumanPlayer(self._board),
+                              AiPlayer(AlphaBeta(), Evaluator()),
                               rows,
                               columns)
         self._engine.set_board_state_change_listener(

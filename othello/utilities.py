@@ -1,3 +1,5 @@
+import numpy as np
+
 def is_valid_move(move, board_state, color_number):
     if move == None:
         return False
@@ -89,6 +91,12 @@ def can_take_stone_in_accumulator_direction(move, board_state, color_number, acc
 def has_valid_move(board_state, color_number):
     return len(list_all_valid_moves(board_state, color_number)) != 0
 
+
+def is_end_state(board_state):
+    return not has_valid_move(board_state, color_string_to_number('black')) \
+        and not has_valid_move(board_state, color_string_to_number('white'))
+
+
 def color_string_to_number(color_string):
     return (-1 if (color_string == 'black') else 1)
 
@@ -121,3 +129,9 @@ def list_all_empty_positions(board_state):
             if is_empty_position(board_state, position):
                 positions.append(position)
     return positions
+
+
+def next_board_state(board_state, move, player_color):
+    next_state = np.copy(board_state)
+    next_state[move] = player_color
+    return next_state
