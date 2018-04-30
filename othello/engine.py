@@ -1,4 +1,5 @@
 import numpy as np
+import utilities
 import threading
 
 
@@ -49,7 +50,8 @@ class Engine(object):
             print("No valid moves for: " + player.color())
             return
         move = player.select_move(board_state)
-        while not self.is_valid_move(move, board_state, player.color()) and self._is_playing:
+        color_number = utilities.color_string_to_number(player.color())
+        while not utilities.is_valid_move(move, board_state, color_number) and self._is_playing:
             move = player.select_move(board_state)
         if move is not None:
             self.apply_new_move(move, player)
@@ -63,61 +65,35 @@ class Engine(object):
         self._game_thread.kill_received = True
 
     def apply_new_move(self, move, player):
-        player_color = -1 if player.color() == 'black' else 1
+        player_color = utilities.color_string_to_number(player.color())
         opponent_color = player_color * -1
         board_state = self._board_state
-        if self.can_take_stones_vertically_up(move, board_state, player_color):
+        if utilities.can_take_stones_vertically_up(move, board_state, player_color):
             self.flip_stones_vertically_up(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_vertically_down(move, board_state, player_color):
+        if utilities.can_take_stones_vertically_down(move, board_state, player_color):
             self.flip_stones_vertically_down(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_horizontally_left(move, board_state, player_color):
+        if utilities.can_take_stones_horizontally_left(move, board_state, player_color):
             self.flip_stones_horizontally_left(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_horizontally_right(move, board_state, player_color):
+        if utilities.can_take_stones_horizontally_right(move, board_state, player_color):
             self.flip_stones_horizontally_right(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_diagonally_up_left(move, board_state, player_color):
+        if utilities.can_take_stones_diagonally_up_left(move, board_state, player_color):
             self.flip_stones_diagonally_up_left(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_diagonally_up_right(move, board_state, player_color):
+        if utilities.can_take_stones_diagonally_up_right(move, board_state, player_color):
             self.flip_stones_diagonally_up_right(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_diagonally_down_left(move, board_state, player_color):
+        if utilities.can_take_stones_diagonally_down_left(move, board_state, player_color):
             self.flip_stones_diagonally_down_left(
                 move, board_state, player_color, opponent_color)
-        if self.can_take_stones_diagonally_down_right(move, board_state, player_color):
+        if utilities.can_take_stones_diagonally_down_right(move, board_state, player_color):
             self.flip_stones_diagonally_down_right(
                 move, board_state, player_color, opponent_color)
         board_state[move] = player_color
         self.notify_new_board_state(self._board_state)
-
-    def is_valid_move(self, move, board_state, color):
-        if move == None:
-            return False
-        (x, y) = move
-        if board_state[(x, y)] != 0:
-            # Stone is already placed
-            return False
-        player_color = (-1 if (color == 'black') else 1)
-        if self.can_take_stones_vertically_up(move, board_state, player_color):
-            return True
-        if self.can_take_stones_vertically_down(move, board_state, player_color):
-            return True
-        if self.can_take_stones_horizontally_left(move, board_state, player_color):
-            return True
-        if self.can_take_stones_horizontally_right(move, board_state, player_color):
-            return True
-        if self.can_take_stones_diagonally_up_left(move, board_state, player_color):
-            return True
-        if self.can_take_stones_diagonally_up_right(move, board_state, player_color):
-            return True
-        if self.can_take_stones_diagonally_down_left(move, board_state, player_color):
-            return True
-        if self.can_take_stones_diagonally_down_right(move, board_state, player_color):
-            return True
-        return False
 
     def flip_stones_vertically_up(self, move, board_state, player_color, opponent_color):
         def accumulator(x, y, step):
@@ -161,87 +137,19 @@ class Engine(object):
 
     def flip_stones_in_accumulator_direction(self, move, board_state, player_color, opponent_color, accumulator):
         (x, y) = move
-        for i in range(1, max(self._board_rows, self._board_columns), 1):
+        (rows, columns) = board_state.shape
+        for i in range(1, max(rows, columns), 1):
             position = accumulator(x, y, i)
-            if self.is_out_of_board(position):
+            if utilities.is_out_of_board(board_state, position):
                 break
             if board_state[position] == opponent_color:
                 board_state[position] = player_color
             else:
                 break
 
-    def can_take_stones_vertically_up(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x, y + step)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_vertically_down(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x, y - step)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_horizontally_left(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x - step, y)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_horizontally_right(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x + step, y)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_diagonally_up_left(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x - step, y + step)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_diagonally_up_right(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x + step, y + step)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_diagonally_down_left(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x - step, y - step)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stones_diagonally_down_right(self, move, board_state, player_color):
-        def accumulator(x, y, step):
-            return (x + step, y - step)
-        return self.can_take_stone_in_accumulator_direction(move, board_state, player_color, accumulator)
-
-    def can_take_stone_in_accumulator_direction(self, move, board_state, player_color, accumulator):
-        (x, y) = move
-        # check diagonal
-        for i in range(1, max(self._board_rows, self._board_columns), 1):
-            position = accumulator(x, y, i)
-            if self.is_out_of_board(position) or board_state[position] == 0:
-                break
-            if (board_state[position] == player_color):
-                if i != 1:
-                    return True
-                else:
-                    return False
-        return False
-
     def has_valid_move(self, player, board_state):
-        empty_positions = self.list_all_empty_positions(board_state)
-        for move in empty_positions:
-            if self.is_valid_move(move, board_state, player.color()):
-                return True
-        return False
-
-    def list_all_empty_positions(self, board_state):
-        positions = []
-        for x in range(self._board_rows):
-            for y in range(self._board_columns):
-                if board_state[(x, y)] == 0:
-                    positions.append((x, y))
-        return positions
-
-    def is_out_of_board(self, position):
-        (x, y) = position
-        return (x < 0 or y < 0 or self._board_rows <= x or self._board_columns <= y)
+        color_number = utilities.color_string_to_number(player.color())
+        return utilities.has_valid_move(board_state, color_number)
 
     def set_board_state_change_listener(self, listener):
         self._board_state_change_listener = listener
