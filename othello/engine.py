@@ -2,7 +2,7 @@ import numpy as np
 import threading
 
 
-class OthelloEngine(object):
+class Engine(object):
     def __init__(self, player_black, player_white, board_rows, board_columns):
         self._board_rows = board_rows
         self._board_columns = board_columns

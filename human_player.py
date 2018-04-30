@@ -1,9 +1,9 @@
-from othello_player import OthelloPlayer
+from othello.player import Player
 import threading
 
-class HumanOthelloPlayer(OthelloPlayer):
+class HumanPlayer(Player):
     def __init__(self, board):
-        super(HumanOthelloPlayer, self).__init__()
+        super(HumanPlayer, self).__init__()
         self._board = board
         self._selected_move = None
         self._lock = threading.Condition()

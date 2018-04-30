@@ -2,19 +2,19 @@ from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from board import Board
-from othello_engine import OthelloEngine
-from human_othello_player import HumanOthelloPlayer
+from human_player import HumanPlayer
+from othello.engine import Engine
 
 
-class Othello(App):
+class OthelloApp(App):
     def build(self):
         rows = 8
         columns = 8
         self._board = self.setup_board(rows, columns)
-        self._engine = OthelloEngine(HumanOthelloPlayer(self._board),
-                                     HumanOthelloPlayer(self._board),
-                                     rows,
-                                     columns)
+        self._engine = Engine(HumanPlayer(self._board),
+                              HumanPlayer(self._board),
+                              rows,
+                              columns)
         self._engine.set_board_state_change_listener(
             self.on_state_change)
         self._root = BoxLayout(orientation='vertical')

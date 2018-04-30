@@ -1,9 +1,9 @@
-from othello import Othello
+from othello_app import OthelloApp
 from kivy.core.window import Window
 Window.size = (640,700)
 
 def main():
-    Othello().run()
+    OthelloApp().run()
 
 
 if __name__ == "__main__":
