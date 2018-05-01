@@ -2,7 +2,7 @@ import numpy as np
 import utilities
 from board import Board
 
-
+# Othello board implementation based on numpy matrix(2d-array)
 class MatrixBoard(Board):
     def __init__(self, rows=8, columns=8, board_state=None):
         super(MatrixBoard, self).__init__()
