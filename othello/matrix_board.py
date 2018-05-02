@@ -3,6 +3,8 @@ import utilities
 from board import Board
 
 # Othello board implementation based on numpy matrix(2d-array)
+
+
 class MatrixBoard(Board):
     def __init__(self, rows=8, columns=8, board_state=None):
         super(MatrixBoard, self).__init__()
@@ -192,6 +194,14 @@ class MatrixBoard(Board):
             if self.is_valid_move(move, color_number):
                 valid_moves.append(move)
         return valid_moves
+
+    def list_all_next_states(self, color_number):
+        empty_positions = self.list_all_empty_positions()
+        next_states = []
+        for move in empty_positions:
+            if self.is_valid_move(move, color_number):
+                next_states.append(self.next_board_state(move, color_number)) 
+        return next_states
 
     def list_all_empty_positions(self):
         positions = []

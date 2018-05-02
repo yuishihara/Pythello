@@ -34,8 +34,10 @@ class BitBoard(Board):
         return self.generate_flip_pattern(move, player_color) != 0
 
     def apply_new_move(self, move, player_color):
-        move_bit_board = self.board_with_stone_at(move)
         flip_pattern = self.generate_flip_pattern(move, player_color)
+        if flip_pattern == 0:
+            return
+        move_bit_board = self.board_with_stone_at(move)
         if player_color == -1:
             self._black_bit_board ^= (move_bit_board | flip_pattern)
             self._white_bit_board ^= flip_pattern
@@ -64,82 +66,94 @@ class BitBoard(Board):
                     moves.append(move)
         return moves
 
-    def list_all_empty_positions(self):
-        positions = []
-        (rows, columns)=self.shape
+    def list_all_next_states(self, color_number):
+        states = []
+        (rows, columns) = self.shape
         for x in range(rows):
             for y in range(columns):
-                position=(x, y)
+                move = (x, y)
+                next_state = self.next_board_state(move, color_number)
+                if self.is_same_board_state(next_state):
+                    continue
+                states.append(next_state)
+        return states
+
+    def list_all_empty_positions(self):
+        positions = []
+        (rows, columns) = self.shape
+        for x in range(rows):
+            for y in range(columns):
+                position = (x, y)
                 if self.is_empty_position(position):
                     positions.append(position)
         return positions
 
     def generate_flip_pattern(self, move, player_color):
-        flip_pattern=0
+        flip_pattern = 0
         if not self.is_empty_position(move):
             # Stone is already placed
             return flip_pattern
-        move_bit_board=self.board_with_stone_at(move)
-        flip_pattern=self.flip_pattern_vertically_up(move_bit_board, player_color) | \
+        move_bit_board = self.board_with_stone_at(move)
+        flip_pattern = self.flip_pattern_vertically_up(move_bit_board, player_color) | \
             self.flip_pattern_vertically_down(move_bit_board, player_color) | \
             self.flip_pattern_horizontally_left(move_bit_board, player_color) | \
             self.flip_pattern_horizontally_right(move_bit_board, player_color) | \
             self.flip_pattern_diagonally_up_left(move_bit_board, player_color) | \
             self.flip_pattern_diagonally_up_right(move_bit_board, player_color) | \
             self.flip_pattern_diagonally_down_left(move_bit_board, player_color) | \
-            self.flip_pattern_diagonally_down_right(
-                move_bit_board, player_color)
+            self.flip_pattern_diagonally_down_right(move_bit_board, player_color)
         return flip_pattern
 
     def flip_pattern_vertically_up(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board << self._columns) & UP_DOWN_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board << self._columns)
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, UP_DOWN_MASK)
 
     def flip_pattern_vertically_down(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board >> self._columns) & UP_DOWN_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board >> self._columns)
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, UP_DOWN_MASK)
 
     def flip_pattern_horizontally_left(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board << 1) & LEFT_RIGHT_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board << 1)
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, LEFT_RIGHT_MASK)
 
     def flip_pattern_horizontally_right(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board >> 1) & LEFT_RIGHT_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board >> 1)
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, LEFT_RIGHT_MASK)
 
     def flip_pattern_diagonally_up_left(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board << (self._columns + 1)) & DIAGONAL_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board << (self._columns + 1))
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, DIAGONAL_MASK)
 
     def flip_pattern_diagonally_up_right(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board << (self._columns - 1)) & DIAGONAL_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board << (self._columns - 1))
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, DIAGONAL_MASK)
 
     def flip_pattern_diagonally_down_left(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board >> (self._columns - 1)) & DIAGONAL_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board >> (self._columns - 1))
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, DIAGONAL_MASK)
 
     def flip_pattern_diagonally_down_right(self, move_bit_board, player_color):
         def shifter(bit_board):
-            return ((bit_board >> (self._columns + 1)) & DIAGONAL_MASK)
-        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter)
+            return (bit_board >> (self._columns + 1))
+        return self.flip_pattern_for_shifter_direction(move_bit_board, player_color, shifter, DIAGONAL_MASK)
 
-    def flip_pattern_for_shifter_direction(self, move_bit_board, player_color, shifter):
-        flip_pattern=0
-        mask=shifter(move_bit_board)
-        (player_board, opponent_board)=self.select_players_and_opponents_board(
+    def flip_pattern_for_shifter_direction(self, move_bit_board, player_color, shifter, mask):
+        flip_pattern = 0
+        shifted_move = shifter(move_bit_board)
+        (player_board, opponent_board) = self.select_players_and_opponents_board(
             player_color)
-        while (mask != 0) and (mask & opponent_board != 0):
-            flip_pattern |= mask
-            mask = shifter(mask)
-        if (player_board & mask) == 0:
+        masked_opponent_board = mask & opponent_board
+        while (shifted_move != 0) and (shifted_move & masked_opponent_board != 0):
+            flip_pattern |= shifted_move
+            shifted_move = shifter(shifted_move)
+        if (player_board & shifted_move) == 0:
             return 0
         else:
             return flip_pattern
@@ -192,6 +206,11 @@ class BitBoard(Board):
         next_board.apply_new_move(move, player_color)
         return next_board
 
+    def is_same_board_state(self, state_to_compare):
+        current_board = self._black_bit_board | self._white_bit_board
+        target_board = state_to_compare._black_bit_board | state_to_compare._white_bit_board
+        return current_board == target_board
+
 
 if __name__ == "__main__":
     bit_board = BitBoard()
@@ -202,7 +221,7 @@ if __name__ == "__main__":
     print('white: ')
     bit_board.print_bit_board(white)
 
-    position = (2, 3)
+    position = (5, 4)
     move = bit_board.board_with_stone_at(position)
     print('move' + str(position) + ':')
     bit_board.print_bit_board(move)

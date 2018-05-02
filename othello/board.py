@@ -26,6 +26,9 @@ class Board(object):
     def list_all_empty_positions(self):
         pass
 
+    def list_all_next_states(self, color_number):
+        pass
+
     def next_board_state(self, move, player_color):
         pass
 

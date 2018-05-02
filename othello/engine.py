@@ -1,6 +1,7 @@
 import numpy as np
 import utilities
 import threading
+import time
 from matrix_board import MatrixBoard
 from bit_board import BitBoard
 
@@ -27,7 +28,8 @@ class Engine(object):
         if self._is_playing:
             return
         self._is_playing = True
-        self._board_state = BitBoard(self._board_rows, self._board_columns) # MatrixBoard(self._board_rows, self._board_columns)
+        #self._board_state = MatrixBoard(self._board_rows, self._board_columns)
+        self._board_state = BitBoard(self._board_rows, self._board_columns) 
         self.notify_new_board_state(self._board_state.as_numpy_matrix())
         self._game_thread = threading.Thread(
             target=self.run_game, name='game_thread')
@@ -42,7 +44,10 @@ class Engine(object):
             self.wait_player_move(self._player_black, self._board_state)
             if not self._is_playing:
                 return
+            before = time.time()
             self.wait_player_move(self._player_white, self._board_state)
+            after = time.time()
+            print("Time took for searching next move: ", str(after - before))
 
     def wait_player_move(self, player, board_state):
         if not self.has_valid_move(player, board_state):

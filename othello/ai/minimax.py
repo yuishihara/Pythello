@@ -11,8 +11,9 @@ class MiniMax(SearchAlgorithm):
         best_move = valid_moves[0]
         search_depth = 4
         for move in valid_moves:
+            next_state = board_state.next_board_state(move, player_color)
             value = self.minimax_search(
-                board_state, state_evaluator, player_color, player_color * -1, search_depth, True)
+                next_state, state_evaluator, player_color, player_color * -1, search_depth, True)
             if best_value < value:
                 best_value = value
                 best_move = move
@@ -29,18 +30,16 @@ class MiniMax(SearchAlgorithm):
 
         if maximize:
             best_value = float('-infinity')
-            valid_moves = board_state.list_all_valid_moves(player_color)
-            for move in valid_moves:
-                next_state = board_state.next_board_state(move, player_color)
+            next_states = board_state.list_all_next_states(player_color)
+            for next_state in next_states:
                 value = self.minimax_search(
                     next_state, state_evaluator, player_color, opponent_color, depth - 1, False)
                 best_value = max(best_value, value)
             return best_value
         else:
             best_value = float('infinity')
-            valid_moves = board_state.list_all_valid_moves(opponent_color)
-            for move in valid_moves:
-                next_state = board_state.next_board_state(move, opponent_color)
+            next_states = board_state.list_all_next_states(opponent_color)
+            for next_state in next_states:
                 value = self.minimax_search(
                     next_state, state_evaluator, player_color, opponent_color, depth - 1, True)
                 best_value = min(best_value, value)
