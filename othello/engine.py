@@ -2,7 +2,7 @@ import numpy as np
 import utilities
 import threading
 from matrix_board import MatrixBoard
-
+from bit_board import BitBoard
 
 class Engine(object):
     def __init__(self, player_black, player_white, board_rows, board_columns):
@@ -27,7 +27,7 @@ class Engine(object):
         if self._is_playing:
             return
         self._is_playing = True
-        self._board_state = MatrixBoard(self._board_rows, self._board_columns)
+        self._board_state = BitBoard(self._board_rows, self._board_columns) # MatrixBoard(self._board_rows, self._board_columns)
         self.notify_new_board_state(self._board_state.as_numpy_matrix())
         self._game_thread = threading.Thread(
             target=self.run_game, name='game_thread')

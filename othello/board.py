@@ -17,9 +17,6 @@ class Board(object):
     def is_end_state(self):
         pass
 
-    def is_out_of_board(self, position):
-        pass
-
     def is_empty_position(self, position):
         pass
 
