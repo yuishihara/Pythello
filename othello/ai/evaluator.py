@@ -16,14 +16,13 @@ class Evaluator(object):
 
     def evaluate(self, board_state, player_color):
         player_move_num = len(board_state.list_all_valid_moves(player_color))
-        opponent_move_num = len(
-            board_state.list_all_valid_moves(player_color * -1))
+        opponent_move_num = len(board_state.list_all_valid_moves(player_color * -1))
         matrix_form = board_state.as_numpy_matrix()
+        matrix_form = np.maximum(0, matrix_form * player_color)
         board_value = np.sum(np.multiply(
             POSITION_VALUES, matrix_form)) * player_color
 #        print("player color: " + str(player_color))
 #        print("position values: \n" + str(POSITION_VALUES))
-#        print("state: \n" + str(matrix_form))
 #        print("value: " + str(board_value))
         return (player_move_num - opponent_move_num) * 0.1 + board_value
 

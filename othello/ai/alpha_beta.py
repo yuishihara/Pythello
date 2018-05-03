@@ -10,7 +10,7 @@ class AlphaBeta(SearchAlgorithm):
         valid_moves = board_state.list_all_valid_moves(player_color)
         best_value = float('-infinity')
         best_move = valid_moves[0]
-        search_depth = 5
+        search_depth = 6
         alpha = float('-infinity')
         beta = float('infinity')
         for move in valid_moves:
