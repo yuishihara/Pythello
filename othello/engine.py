@@ -37,9 +37,10 @@ class Engine(object):
 
     def run_game(self):
         while self._is_playing:
-            print('playing!!')
+            stone_num = utilities.count_stone_num(self._board_state)
+            print('playing!! (black, white): ', str(stone_num))
             if self._board_state.is_end_state():
-                print("No valid moves for both players. End of game")
+                print("No valid moves for both players. End of game: (black, white): ", str(stone_num))
                 break
             self.wait_player_move(self._player_black, self._board_state)
             if not self._is_playing:
