@@ -13,7 +13,7 @@ class MiniMax(SearchAlgorithm):
         for move in valid_moves:
             next_state = board_state.next_board_state(move, player_color)
             value = self.minimax_search(
-                next_state, state_evaluator, player_color, player_color * -1, search_depth, True)
+                next_state, state_evaluator, player_color, player_color * -1, search_depth, False)
             if best_value < value:
                 best_value = value
                 best_move = move
