@@ -200,8 +200,8 @@ class BitBoard(Board):
             return 0
 
     def next_board_state(self, move, player_color):
-        black = self._black_bit_board if player_color == 1 else self._white_bit_board
-        white = self._white_bit_board if player_color == 1 else self._black_bit_board
+        black = self._black_bit_board
+        white = self._white_bit_board
         next_board = BitBoard(self._rows, self._columns, black, white)
         next_board.apply_new_move(move, player_color)
         return next_board
