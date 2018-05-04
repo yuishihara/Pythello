@@ -38,7 +38,7 @@ class BitBoard(Board):
         if flip_pattern == 0:
             return
         move_bit_board = self.board_with_stone_at(move)
-        if player_color == -1:
+        if player_color == 'black':
             self._black_bit_board ^= (move_bit_board | flip_pattern)
             self._white_bit_board ^= flip_pattern
         else:
@@ -101,7 +101,8 @@ class BitBoard(Board):
             self.flip_pattern_diagonally_up_left(move_bit_board, player_color) | \
             self.flip_pattern_diagonally_up_right(move_bit_board, player_color) | \
             self.flip_pattern_diagonally_down_left(move_bit_board, player_color) | \
-            self.flip_pattern_diagonally_down_right(move_bit_board, player_color)
+            self.flip_pattern_diagonally_down_right(
+                move_bit_board, player_color)
         return flip_pattern
 
     def flip_pattern_vertically_up(self, move_bit_board, player_color):
@@ -159,10 +160,10 @@ class BitBoard(Board):
             return flip_pattern
 
     def select_players_and_opponents_board(self, player_color):
-        player_board = self._black_bit_board if player_color == -1 else self._white_bit_board
-        opponent_board = self._white_bit_board if player_color == - \
-            1 else self._black_bit_board
-        return (player_board, opponent_board)
+        if player_color == 'black':
+            return (self._black_bit_board, self._white_bit_board) 
+        else:
+            return (self._white_bit_board, self._black_bit_board)
 
     def board_with_stone_at(self, position):
         (row, column) = position

@@ -3,6 +3,7 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.graphics import Ellipse
 from kivy.graphics import Color
 from kivy.graphics.instructions import InstructionGroup
+from othello import utilities
 
 
 class Board(GridLayout):
@@ -49,7 +50,8 @@ class Board(GridLayout):
                 if status == 0:
                     continue
                 else:
-                    self.place_stone(x, y, 'black' if status == -1 else 'white')
+                    color = utilities.color_number_to_string(status)
+                    self.place_stone(x, y, color)
 
     def place_stone(self, x, y, color):
         button = self._buttons[self.position_to_id(x, y)]

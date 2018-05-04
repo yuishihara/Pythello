@@ -6,18 +6,18 @@ class AlphaBeta(SearchAlgorithm):
         super(AlphaBeta, self).__init__()
         pass
 
-    def search_optimal_move(self, board_state, state_evaluator, player_color):
+    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color):
         valid_moves = board_state.list_all_valid_moves(player_color)
         best_value = float('-infinity')
         best_move = valid_moves[0]
-        search_depth = 6
+        search_depth = 4
         alpha = float('-infinity')
         beta = float('infinity')
         for move in valid_moves:
             # print('searching for move: ' + str(move))
             next_state = board_state.next_board_state(move, player_color)
             value = self.alpha_beta_search(next_state, state_evaluator,
-                                           player_color, player_color * -1,
+                                           player_color, opponent_color,
                                            alpha, beta,
                                            search_depth, False)
             if best_value < value:
@@ -32,7 +32,7 @@ class AlphaBeta(SearchAlgorithm):
                           alpha, beta,
                           depth, maximize):
         if depth == 0 or board_state.is_end_state():
-            return state_evaluator.evaluate(board_state, player_color)
+            return state_evaluator.evaluate(board_state, player_color, opponent_color)
 
         if not board_state.has_valid_move(player_color if maximize else opponent_color):
             return self.alpha_beta_search(

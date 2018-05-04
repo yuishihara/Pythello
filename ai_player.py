@@ -9,7 +9,9 @@ class AiPlayer(Player):
         self._state_evaluator = evaluator
 
     def select_move(self, board_state):
-        color_number = utilities.color_string_to_number(self.color())
+        player_color = self.color()
+        opponent_color = utilities.opponent_color(player_color)
         return self._search_algorithm.search_optimal_move(board_state,
                                                           self._state_evaluator,
-                                                          color_number)
+                                                          player_color,
+                                                          opponent_color)

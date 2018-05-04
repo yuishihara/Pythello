@@ -55,8 +55,7 @@ class Engine(object):
             print("No valid moves for: " + player.color())
             return
         move = player.select_move(board_state)
-        color_number = utilities.color_string_to_number(player.color())
-        while not board_state.is_valid_move(move, color_number) and self._is_playing:
+        while not board_state.is_valid_move(move, player.color()) and self._is_playing:
             move = player.select_move(board_state)
         if move is not None:
             self.apply_new_move(move, player)
@@ -70,14 +69,12 @@ class Engine(object):
         self._game_thread.kill_received = True
 
     def apply_new_move(self, move, player):
-        player_color = utilities.color_string_to_number(player.color())
         board_state = self._board_state
-        board_state.apply_new_move(move, player_color)
+        board_state.apply_new_move(move, player.color())
         self.notify_new_board_state(self._board_state.as_numpy_matrix())
 
     def has_valid_move(self, player, board_state):
-        color_number = utilities.color_string_to_number(player.color())
-        return board_state.has_valid_move(color_number)
+        return board_state.has_valid_move(player.color())
 
     def set_board_state_change_listener(self, listener):
         self._board_state_change_listener = listener
