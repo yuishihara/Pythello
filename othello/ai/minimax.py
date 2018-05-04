@@ -5,11 +5,11 @@ class MiniMax(SearchAlgorithm):
     def __init__(self):
         super(MiniMax, self).__init__()
 
-    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color):
+    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color, depth = 4):
         valid_moves = board_state.list_all_valid_moves(player_color)
         best_value = float('-infinity')
         best_move = valid_moves[0]
-        search_depth = 4
+        search_depth = depth
         for move in valid_moves:
             next_state = board_state.next_board_state(move, player_color)
             value = self.minimax_search(
