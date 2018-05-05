@@ -1,5 +1,5 @@
 from board import Board
-from logging import getLogger, DEBUG, basicConfig 
+from logging import getLogger, DEBUG, basicConfig
 import numpy as np
 import utilities
 
@@ -47,34 +47,33 @@ class BitBoard(Board):
             self._white_bit_board ^= (move_bit_board | flip_pattern)
             self._black_bit_board ^= flip_pattern
 
-    def has_valid_move(self, color_number):
-        return len(self.list_all_valid_moves(color_number)) != 0
+    def has_valid_move(self, player_color):
+        return len(self.list_all_valid_moves(player_color)) != 0
 
     def is_end_state(self):
-        return not self.has_valid_move(utilities.color_string_to_number('black')) \
-            and not self.has_valid_move(utilities.color_string_to_number('white'))
+        return not self.has_valid_move('black') and not self.has_valid_move('white')
 
     def is_empty_position(self, position):
         position_bit_board = self.board_with_stone_at(position)
         return position_bit_board & (self._black_bit_board | self._white_bit_board) == 0
 
-    def list_all_valid_moves(self, color_number):
+    def list_all_valid_moves(self, player_color):
         moves = []
         (rows, columns) = self.shape
         for x in range(rows):
             for y in range(columns):
                 move = (x, y)
-                if self.is_valid_move(move, color_number):
+                if self.is_valid_move(move, player_color):
                     moves.append(move)
         return moves
 
-    def list_all_next_states(self, color_number):
+    def list_all_next_states(self, player_color):
         states = []
         (rows, columns) = self.shape
         for x in range(rows):
             for y in range(columns):
                 move = (x, y)
-                next_state = self.next_board_state(move, color_number)
+                next_state = self.next_board_state(move, player_color)
                 if self.is_same_board_state(next_state):
                     continue
                 states.append(next_state)
