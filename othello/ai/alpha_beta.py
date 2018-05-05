@@ -1,12 +1,13 @@
+from logging import getLogger
 from search_algorithm import SearchAlgorithm
 
 
 class AlphaBeta(SearchAlgorithm):
     def __init__(self):
         super(AlphaBeta, self).__init__()
-        pass
+        self._logger = getLogger(__name__)
 
-    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color, depth = 4):
+    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color, depth=4):
         valid_moves = board_state.list_all_valid_moves(player_color)
         best_value = float('-infinity')
         best_move = valid_moves[0]
@@ -14,7 +15,7 @@ class AlphaBeta(SearchAlgorithm):
         alpha = float('-infinity')
         beta = float('infinity')
         for move in valid_moves:
-            # print('searching for move: ' + str(move))
+            self._logger.debug('searching for move: ' + str(move))
             next_state = board_state.next_board_state(move, player_color)
             value = self.alpha_beta_search(next_state, state_evaluator,
                                            player_color, opponent_color,
@@ -23,7 +24,7 @@ class AlphaBeta(SearchAlgorithm):
             if best_value < value:
                 best_value = value
                 best_move = move
-            # print('searched for move: ' + str(move) + ' best value: ' + str(best_value))
+            self._logger.debug('searched for move: ' + str(move) + ' best value: ' + str(best_value))
             alpha = max(alpha, best_value)
         return best_move
 

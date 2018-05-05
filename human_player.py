@@ -1,5 +1,6 @@
-from othello.player import Player
 import threading
+from logging import getLogger
+from othello.player import Player
 
 class HumanPlayer(Player):
     def __init__(self, board):
@@ -7,6 +8,7 @@ class HumanPlayer(Player):
         self._board = board
         self._selected_move = None
         self._lock = threading.Condition()
+        self._logger = getLogger(__name__)
 
     def select_move(self, board_state):
         self._board.set_on_board_press_listener(self.on_board_pressed)
@@ -14,7 +16,7 @@ class HumanPlayer(Player):
             with self._lock:
                 self._lock.wait()
         except Exception as e:
-            print("Exception occurred")
+            self._logger.error("Exception occurred while waiting for player's move!")
         return self._selected_move
 
     def on_board_pressed(self, x, y):

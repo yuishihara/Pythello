@@ -1,3 +1,4 @@
+from logging import getLogger
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.graphics import Ellipse
@@ -17,6 +18,7 @@ class Board(GridLayout):
         self._board_color = (0, 1, 0, 0.9)  # (r, g, b, a)
         self._buttons = {}
         self._board_press_listener = None
+        self._logger = getLogger(__name__)
         super(Board, self).__init__(rows=self._board_rows, row_force_default=True, row_default_height=self._row_height,
                                     cols=self._board_columns, col_force_default=True, col_default_width=self._column_width)
         self.setup_board()
@@ -32,8 +34,8 @@ class Board(GridLayout):
                 self.add_widget(button)
 
     def on_press_callback(self, button):
-        print('Button position: ' + str(button.pos))
-        print('Pressed: ' + button.id)
+        self._logger.debug('Button position: ' + str(button.pos))
+        self._logger.debug('Pressed: ' + button.id)
         x, y = self.id_to_position(button.id)
         if self._board_press_listener is not None:
             self._board_press_listener(x, y)
@@ -74,7 +76,7 @@ class Board(GridLayout):
         splitted = id.split(':')
         x = int(splitted[0])
         y = int(splitted[1])
-        print('id: ' + id + ' position: ' + str((x, y)))
+        self._logger.debug('id: ' + id + ' position: ' + str((x, y)))
         return (x, y)
 
     def new_white_stone(self, position, size):

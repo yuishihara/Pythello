@@ -1,4 +1,5 @@
 from board import Board
+from logging import getLogger, DEBUG, basicConfig 
 import numpy as np
 import utilities
 
@@ -10,6 +11,7 @@ DIAGONAL_MASK = UP_DOWN_MASK & LEFT_RIGHT_MASK
 class BitBoard(Board):
     def __init__(self, rows=8, columns=8, black_bit_board=None, white_bit_board=None):
         super(BitBoard, self).__init__()
+        self._logger = getLogger(__name__)
         self._rows = rows
         self._columns = columns
 
@@ -161,7 +163,7 @@ class BitBoard(Board):
 
     def select_players_and_opponents_board(self, player_color):
         if player_color == 'black':
-            return (self._black_bit_board, self._white_bit_board) 
+            return (self._black_bit_board, self._white_bit_board)
         else:
             return (self._white_bit_board, self._black_bit_board)
 
@@ -180,8 +182,7 @@ class BitBoard(Board):
             board += str(i) + ":" + \
                 binary_string[i * self._columns: (i + 1) * self._columns]
             board += '\n'
-        print("  ABCDEFGH")
-        print(board)
+        self._logger.info("\n  ABCDEFGH\n" + board)
 
     def as_numpy_matrix(self):
         matrix = np.zeros(self.shape)
@@ -214,20 +215,22 @@ class BitBoard(Board):
 
 
 if __name__ == "__main__":
+    basicConfig(level=DEBUG)
+    logger = getLogger(__name__)
     bit_board = BitBoard()
     (black, white) = bit_board.generate_initial_board(8, 8)
-    print('black: ')
+    logger.info('black: ')
     bit_board.print_bit_board(black)
 
-    print('white: ')
+    logger.info('white: ')
     bit_board.print_bit_board(white)
 
     position = (5, 4)
     move = bit_board.board_with_stone_at(position)
-    print('move' + str(position) + ':')
+    logger.info('move' + str(position) + ':')
     bit_board.print_bit_board(move)
 
-    print('flip pattern: ')
+    logger.info('flip pattern: ')
     flip = bit_board.generate_flip_pattern(
         position, -1)  # -1 stands for black
     bit_board.print_bit_board(flip)
