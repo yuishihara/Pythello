@@ -1,6 +1,7 @@
+import csv
 import time
 import numpy as np
-from logging import getLogger, INFO, basicConfig 
+from logging import getLogger, INFO, basicConfig
 from othello.ai.alpha_beta import AlphaBeta
 from othello.ai.minimax import MiniMax
 from othello.ai.evaluator import Evaluator
@@ -22,13 +23,14 @@ def algorithm_sanity_check(board_state, evaluator, player_color, opponent_color,
 
 def algorithm_performance_test(board_state, evaluator, player_color, opponent_color, depth):
     logger = getLogger(__name__)
+
     def run_alpha_beta():
         alpha_beta = AlphaBeta()
         alpha_beta.search_optimal_move(
             board_state, evaluator, player_color, opponent_color, depth)
     alpha_beta_time = measure_performance(run_alpha_beta)
     logger.info('AlphaBeta algorithm took(depth = ' +
-          str(depth) + '): ' + str(alpha_beta_time) + 's')
+                str(depth) + '): ' + str(alpha_beta_time) + 's')
 
     def run_minimax():
         minimax = MiniMax()
@@ -36,10 +38,10 @@ def algorithm_performance_test(board_state, evaluator, player_color, opponent_co
             board_state, evaluator, player_color, opponent_color, depth)
     minimax_time = measure_performance(run_minimax)
     logger.info('MiniMax algorithm took(depth = ' +
-          str(depth) + '): ' + str(minimax_time) + 's')
+                str(depth) + '): ' + str(minimax_time) + 's')
 
     logger.info('AlphaBeta is faster than Minimax algorithm for(depth = ' + str(depth) + '): ' +
-          str((minimax_time/alpha_beta_time) * 100) + '%')
+                str((minimax_time/alpha_beta_time) * 100) + '%')
     return (alpha_beta_time, minimax_time)
 
 
@@ -49,7 +51,7 @@ def board_performance_test():
     evaluator = Evaluator()
     player_color = 'black'
     opponent_color = 'white'
-    depth = 4
+    depth = 5
 
     def run_bit_board_alpha_beta():
         alpha_beta = AlphaBeta()
@@ -57,16 +59,17 @@ def board_performance_test():
             bit_board, evaluator, player_color, opponent_color, depth)
     bit_board_time = measure_performance(run_bit_board_alpha_beta)
     logger.info('AlphaBeta with bitboard took(depth = ' +
-          str(depth) + '): ' + str(bit_board_time) + 's')
+                str(depth) + '): ' + str(bit_board_time) + 's')
 
     matrix_board = MatrixBoard()
+
     def run_matrix_board_alpha_beta():
         alpha_beta = AlphaBeta()
         alpha_beta.search_optimal_move(
             matrix_board, evaluator, player_color, opponent_color, depth)
     matrix_board_time = measure_performance(run_matrix_board_alpha_beta)
     logger.info('AlphaBeta with matrixboard took(depth = ' +
-          str(depth) + '): ' + str(matrix_board_time) + 's')
+                str(depth) + '): ' + str(matrix_board_time) + 's')
 
     return (bit_board_time, matrix_board_time)
 
@@ -81,21 +84,38 @@ def measure_performance(target_function):
     return np.average(results)
 
 
+def output_results_to_file(file_name, results):
+    with open(file_name, 'w') as file:
+        csv_writer = csv.writer(file)
+        for result in results:
+            csv_writer.writerow(result)
+
+
 if __name__ == '__main__':
     basicConfig(level=INFO)
+    logger = getLogger(__name__)
     board_state = BitBoard()
     evaluator = Evaluator()
     player_color = 'black'
     opponent_color = 'white'
 
+    logger.info("Running alogorithm sanity check")
     algorithm_sanity_check(board_state, evaluator,
                            player_color, opponent_color, depth=4)
-    
-    board_performance_result = board_performance_test()
+    logger.info("Sanity check done")
 
+    logger.info("Running board performance check")
+    board_performance_result = board_performance_test()
+    output_results_to_file('board_performance_result.csv', [
+                           board_performance_result])
+    logger.info("Board performance check done")
+
+    logger.info("Running algorithm performance check")
     algorithm_performance_results = []
-    for depth in range(1, 6):
+    for depth in range(1, 7):
         result = algorithm_performance_test(board_state, evaluator,
                                             player_color, opponent_color, depth=depth)
         algorithm_performance_results.append(result)
-    
+    output_results_to_file(
+        'algorithm_performance_results.csv', algorithm_performance_results)
+    logger.info("Algorithm performance check done")

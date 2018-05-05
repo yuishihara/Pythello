@@ -102,3 +102,6 @@ ENV/
 
 # DS_Store
 *DS_Store
+
+# Data files
+*.csv
