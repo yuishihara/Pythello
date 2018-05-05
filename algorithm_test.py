@@ -11,12 +11,12 @@ from othello.matrix_board import MatrixBoard
 
 def algorithm_sanity_check(board_state, evaluator, player_color, opponent_color, depth):
     # Check that algorithms return same result
-    alpha_beta = AlphaBeta()
+    alpha_beta = AlphaBeta(depth=depth)
     alpha_beta_best_move = alpha_beta.search_optimal_move(
-        board_state, evaluator, player_color, opponent_color, depth)
-    minimax = MiniMax()
+        board_state, evaluator, player_color, opponent_color)
+    minimax = MiniMax(depth=depth)
     minimax_best_move = minimax.search_optimal_move(
-        board_state, evaluator, player_color, opponent_color, depth)
+        board_state, evaluator, player_color, opponent_color)
 
     assert alpha_beta_best_move == minimax_best_move
 
@@ -25,17 +25,17 @@ def algorithm_performance_test(board_state, evaluator, player_color, opponent_co
     logger = getLogger(__name__)
 
     def run_alpha_beta():
-        alpha_beta = AlphaBeta()
+        alpha_beta = AlphaBeta(depth=depth)
         alpha_beta.search_optimal_move(
-            board_state, evaluator, player_color, opponent_color, depth)
+            board_state, evaluator, player_color, opponent_color)
     alpha_beta_time = measure_performance(run_alpha_beta)
     logger.info('AlphaBeta algorithm took(depth = ' +
                 str(depth) + '): ' + str(alpha_beta_time) + 's')
 
     def run_minimax():
-        minimax = MiniMax()
+        minimax = MiniMax(depth=depth)
         minimax.search_optimal_move(
-            board_state, evaluator, player_color, opponent_color, depth)
+            board_state, evaluator, player_color, opponent_color)
     minimax_time = measure_performance(run_minimax)
     logger.info('MiniMax algorithm took(depth = ' +
                 str(depth) + '): ' + str(minimax_time) + 's')
@@ -54,9 +54,9 @@ def board_performance_test():
     depth = 5
 
     def run_bit_board_alpha_beta():
-        alpha_beta = AlphaBeta()
+        alpha_beta = AlphaBeta(depth=depth)
         alpha_beta.search_optimal_move(
-            bit_board, evaluator, player_color, opponent_color, depth)
+            bit_board, evaluator, player_color, opponent_color)
     bit_board_time = measure_performance(run_bit_board_alpha_beta)
     logger.info('AlphaBeta with bitboard took(depth = ' +
                 str(depth) + '): ' + str(bit_board_time) + 's')
@@ -64,9 +64,9 @@ def board_performance_test():
     matrix_board = MatrixBoard()
 
     def run_matrix_board_alpha_beta():
-        alpha_beta = AlphaBeta()
+        alpha_beta = AlphaBeta(depth=depth)
         alpha_beta.search_optimal_move(
-            matrix_board, evaluator, player_color, opponent_color, depth)
+            matrix_board, evaluator, player_color, opponent_color)
     matrix_board_time = measure_performance(run_matrix_board_alpha_beta)
     logger.info('AlphaBeta with matrixboard took(depth = ' +
                 str(depth) + '): ' + str(matrix_board_time) + 's')

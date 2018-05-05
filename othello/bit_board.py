@@ -33,6 +33,8 @@ class BitBoard(Board):
         return (black, white)
 
     def is_valid_move(self, move, player_color):
+        if not self.is_empty_position(move):
+            return False
         return self.generate_flip_pattern(move, player_color) != 0
 
     def apply_new_move(self, move, player_color):
@@ -73,6 +75,8 @@ class BitBoard(Board):
         for x in range(rows):
             for y in range(columns):
                 move = (x, y)
+                if not self.is_empty_position(move):
+                    continue
                 next_state = self.next_board_state(move, player_color)
                 if self.is_same_board_state(next_state):
                     continue

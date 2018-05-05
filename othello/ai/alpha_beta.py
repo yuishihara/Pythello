@@ -2,6 +2,9 @@ from logging import getLogger
 from search_algorithm import SearchAlgorithm
 
 
+NEGATIVE_INFINITY = float('-infinity')
+POSITIVE_INFINITY = float('infinity')
+
 class AlphaBeta(SearchAlgorithm):
     def __init__(self, depth=4):
         super(AlphaBeta, self).__init__()
@@ -11,11 +14,11 @@ class AlphaBeta(SearchAlgorithm):
     def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color):
         depth = self._depth
         valid_moves = board_state.list_all_valid_moves(player_color)
-        best_value = float('-infinity')
+        best_value = NEGATIVE_INFINITY
         best_move = valid_moves[0]
         search_depth = depth
-        alpha = float('-infinity')
-        beta = float('infinity')
+        alpha = NEGATIVE_INFINITY
+        beta = POSITIVE_INFINITY
         for move in valid_moves:
             self._logger.debug('searching for move: ' + str(move))
             next_state = board_state.next_board_state(move, player_color)
@@ -42,7 +45,7 @@ class AlphaBeta(SearchAlgorithm):
                 board_state, state_evaluator, player_color, opponent_color, alpha, beta, depth - 1, not maximize)
 
         if maximize:
-            best_value = float('-infinity')
+            best_value = NEGATIVE_INFINITY
             next_states = board_state.list_all_next_states(player_color)
             for next_state in next_states:
                 best_value = max(best_value, self.alpha_beta_search(
@@ -52,7 +55,7 @@ class AlphaBeta(SearchAlgorithm):
                     break
             return best_value
         else:
-            best_value = float('infinity')
+            best_value = POSITIVE_INFINITY
             next_states = board_state.list_all_next_states(opponent_color)
             for next_state in next_states:
                 best_value = min(best_value, self.alpha_beta_search(
