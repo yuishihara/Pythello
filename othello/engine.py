@@ -16,9 +16,11 @@ class Engine(object):
         self._player_white.set_color('white')
         self._is_playing = False
         self._logger = getLogger(__name__)
+        self._board_state_change_listener = None
 
     def reset(self):
-        pass
+        self._board_state = BitBoard(self._board_rows, self._board_columns) 
+        self._is_playing = False
 
     def board_size(self):
         return (self._board_rows, self._board_columns)
@@ -29,15 +31,16 @@ class Engine(object):
     def start_game(self):
         if self._is_playing:
             return
-        self._is_playing = True
         #self._board_state = MatrixBoard(self._board_rows, self._board_columns)
         self._board_state = BitBoard(self._board_rows, self._board_columns) 
         self.notify_new_board_state(self._board_state.as_numpy_matrix())
         self._game_thread = threading.Thread(
-            target=self.run_game, name='game_thread')
+            target=self.run_one_game, name='game_thread')
         self._game_thread.start()
 
-    def run_game(self):
+    def run_one_game(self):
+        transitions = [self._board_state.as_numpy_matrix()]
+        self._is_playing = True
         while self._is_playing:
             stone_num = utilities.count_stone_num(self._board_state)
             self._logger.info('playing!! (black, white): %s', str(stone_num))
@@ -45,12 +48,17 @@ class Engine(object):
                 self._logger.info("No valid moves for both players. End of game: (black, white): %s", str(stone_num))
                 break
             self.wait_player_move(self._player_black, self._board_state)
+            transitions.append(self._board_state.as_numpy_matrix())
             if not self._is_playing:
-                return
+                break
             before = time.time()
             self.wait_player_move(self._player_white, self._board_state)
+            transitions.append(self._board_state.as_numpy_matrix())
             after = time.time()
             self._logger.debug("Time took for searching next move: %s", str(after - before))
+        (black_stone, white_stone) = utilities.count_stone_num(self._board_state)
+        winner = 'black' if black_stone > white_stone else 'white'
+        return transitions, winner
 
     def wait_player_move(self, player, board_state):
         if not self.has_valid_move(player, board_state):
@@ -82,4 +90,5 @@ class Engine(object):
         self._board_state_change_listener = listener
 
     def notify_new_board_state(self, state):
-        self._board_state_change_listener(state)
+        if self._board_state_change_listener is not None:
+            self._board_state_change_listener(state)

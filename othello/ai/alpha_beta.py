@@ -3,11 +3,13 @@ from search_algorithm import SearchAlgorithm
 
 
 class AlphaBeta(SearchAlgorithm):
-    def __init__(self):
+    def __init__(self, depth=4):
         super(AlphaBeta, self).__init__()
         self._logger = getLogger(__name__)
+        self._depth = depth
 
-    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color, depth=4):
+    def search_optimal_move(self, board_state, state_evaluator, player_color, opponent_color):
+        depth = self._depth
         valid_moves = board_state.list_all_valid_moves(player_color)
         best_value = float('-infinity')
         best_move = valid_moves[0]
