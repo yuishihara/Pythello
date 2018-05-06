@@ -6,14 +6,21 @@ from othello.ai.alpha_beta import AlphaBeta
 from othello.ai.minimax import MiniMax
 from othello.ai.evaluator import Evaluator
 from othello.bit_board import BitBoard
+from othello.libfastbb import FastBitBoard
 from othello.matrix_board import MatrixBoard
 
 
-def algorithm_sanity_check(board_state, evaluator, player_color, opponent_color, depth):
+def algorithm_sanity_check(evaluator, player_color, opponent_color, depth):
+    board_state = BitBoard()
     # Check that algorithms return same result
     alpha_beta = AlphaBeta(depth=depth)
     alpha_beta_best_move = alpha_beta.search_optimal_move(
         board_state, evaluator, player_color, opponent_color)
+    alpha_beta_with_fastbb = AlphaBeta(depth=depth)
+    alpha_beta_fastbb_best_move = alpha_beta_with_fastbb.search_optimal_move(
+        FastBitBoard(), evaluator, player_color, opponent_color)
+    assert alpha_beta_best_move == alpha_beta_fastbb_best_move
+
     minimax = MiniMax(depth=depth)
     minimax_best_move = minimax.search_optimal_move(
         board_state, evaluator, player_color, opponent_color)
@@ -61,6 +68,16 @@ def board_performance_test():
     logger.info('AlphaBeta with bitboard took(depth = ' +
                 str(depth) + '): ' + str(bit_board_time) + 's')
 
+    fast_bit_board = FastBitBoard()
+
+    def run_fast_bit_board_alpha_beta():
+        alpha_beta = AlphaBeta(depth=depth)
+        alpha_beta.search_optimal_move(
+            fast_bit_board, evaluator, player_color, opponent_color)
+    fast_bit_board_time = measure_performance(run_fast_bit_board_alpha_beta)
+    logger.info('AlphaBeta with fastbitboard took(depth = ' +
+                str(depth) + '): ' + str(fast_bit_board_time) + 's')
+
     matrix_board = MatrixBoard()
 
     def run_matrix_board_alpha_beta():
@@ -100,8 +117,7 @@ if __name__ == '__main__':
     opponent_color = 'white'
 
     logger.info("Running alogorithm sanity check")
-    algorithm_sanity_check(board_state, evaluator,
-                           player_color, opponent_color, depth=4)
+    algorithm_sanity_check(evaluator, player_color, opponent_color, depth=4)
     logger.info("Sanity check done")
 
     logger.info("Running board performance check")
