@@ -5,6 +5,7 @@ import time
 from logging import getLogger
 from matrix_board import MatrixBoard
 from bit_board import BitBoard
+from libfastbb import FastBitBoard
 
 class Engine(object):
     def __init__(self, player_black, player_white, board_rows, board_columns):
@@ -19,7 +20,7 @@ class Engine(object):
         self._board_state_change_listener = None
 
     def reset(self):
-        self._board_state = BitBoard(self._board_rows, self._board_columns) 
+        self._board_state = FastBitBoard(self._board_rows, self._board_columns) 
         self._is_playing = False
 
     def board_size(self):
@@ -32,7 +33,7 @@ class Engine(object):
         if self._is_playing:
             return
         #self._board_state = MatrixBoard(self._board_rows, self._board_columns)
-        self._board_state = BitBoard(self._board_rows, self._board_columns) 
+        self._board_state = FastBitBoard(self._board_rows, self._board_columns) 
         self.notify_new_board_state(self._board_state.as_numpy_matrix())
         self._game_thread = threading.Thread(
             target=self.run_one_game, name='game_thread')

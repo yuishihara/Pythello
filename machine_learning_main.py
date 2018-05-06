@@ -9,8 +9,8 @@ def play_one_episode():
     logger = getLogger(__name__)
     rows = 8
     columns = 8
-    black_player = AiPlayer(AlphaBeta(depth=2), Evaluator())
-    white_player = AiPlayer(AlphaBeta(depth=2), Evaluator())
+    black_player = AiPlayer(AlphaBeta(depth=4), Evaluator())
+    white_player = AiPlayer(AlphaBeta(depth=4), Evaluator())
     othello_engine = Engine(black_player,
                             white_player,
                             rows,
